@@ -17,6 +17,8 @@ import {
   groupBy,
   concat,
   race,
+  combineLatest,
+  catchError,
 } from 'rxjs';
 import {
   buffer,
@@ -26,13 +28,21 @@ import {
   count,
   debounce,
   debounceTime,
+  defaultIfEmpty,
   delay,
+  every,
   expand,
+  find,
+  findIndex,
+  isEmpty,
   max,
   mergeMap,
   min,
   reduce,
+  retry,
   switchMap,
+  timeout,
+  toArray,
 } from 'rxjs/operators';
 import { ajax } from 'rxjs/ajax';
 
@@ -180,12 +190,84 @@ import { ajax } from 'rxjs/ajax';
  * ignoreElements, sample, skip, throttle
  */
 
-let obs = fromEvent(document, 'click').pipe(
-  debounce(() => {
-    return interval(2000);
+// let obs = fromEvent(document, 'click').pipe(
+//   debounce(() => {
+//     return interval(2000);
+//   })
+// );
+
+// obs.subscribe((d) => {
+//   console.log(d);
+// });
+
+/*************************************************** */
+/**
+ * Utility operators
+ *
+ * tap, delay, delayWhen, timeout, toArray
+ */
+
+// let obs = of(1, 2, 3).pipe(delay(3000), timeout(1000));
+
+// let obs = of(1, 2, 3).pipe(toArray());
+
+// obs.subscribe((d) => {
+//   console.log(d);
+// });
+
+/********************************************** */
+
+/**
+ * Conditional operator
+ * defaultIfEmpty, every, find, findIndex, isEmpty
+ */
+
+// let obs = of().pipe(defaultIfEmpty('hey, no val found'));
+
+// let obs = of(1, 2, 3).pipe(
+//   every((d) => {
+//     return d % 2 === 0;
+//   })
+// );
+
+// let obs = of(1, 2, 3).pipe(
+//   find((d) => {
+//     return d % 2 === 0;
+//   })
+// );
+
+// let obs = of(1, 2, 3).pipe(
+//   findIndex((d) => {
+//     return d % 2 === 0;
+//   })
+// );
+
+// let obs = of(1, 2, 3).pipe(isEmpty());
+
+// obs.subscribe((d) => {
+//   console.log(d);
+// });
+
+/********************************************* */
+
+/**
+ * Error Handling
+ *
+ * catchError, retry
+ */
+
+let obs = ajax('localhostL: 8080').pipe(
+  retry(6),
+  catchError((e) => {
+    return of(3);
   })
 );
 
-obs.subscribe((d) => {
-  console.log(d);
-});
+obs.subscribe(
+  (d) => {
+    console.log(d);
+  },
+  (e) => {
+    console.log('error -> ', e);
+  }
+);
